@@ -6,7 +6,7 @@ ruby '>= 2.3.0'
 gem 'zeitwerk'
 
 gem 'inifile'
-gem 'lxp-packet'
+gem 'lxp-packet', '~> 0.5.0'
 
 group :pi do
   gem 'rpi_gpio'

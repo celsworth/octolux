@@ -44,8 +44,8 @@ class LuxListener
 
         @last_packet = Time.now
         process_input(pkt) if pkt.is_a?(LXP::Packet::ReadInput)
-        process_hold(pkt) if pkt.is_a?(LXP::Packet::ReadHold)
-        process_hold(pkt) if pkt.is_a?(LXP::Packet::WriteSingle)
+        process_read_hold(pkt) if pkt.is_a?(LXP::Packet::ReadHold)
+        process_write_single(pkt) if pkt.is_a?(LXP::Packet::WriteSingle)
       end
     ensure
       socket.close
@@ -63,9 +63,15 @@ class LuxListener
       MQ.publish("octolux/inputs/#{n}", pkt.to_h)
     end
 
-    def process_hold(pkt)
-      registers[pkt.register] = pkt.value
+    def process_read_hold(pkt)
+      pkt.to_h.each do |register, value|
+        registers[register] = value
+        MQ.publish("octolux/hold/#{register}", value)
+      end
+    end
 
+    def process_write_single(pkt)
+      registers[pkt.register] = pkt.value
       MQ.publish("octolux/hold/#{pkt.register}", pkt.value)
     end
   end

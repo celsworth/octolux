@@ -16,6 +16,10 @@ class App < Roda
       r.get 'inputs' do
         LuxListener.inputs
       end
+
+      r.get 'registers' do
+        LuxListener.registers
+      end
     end
   end
 end
