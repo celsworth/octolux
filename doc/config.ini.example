@@ -1,18 +1,24 @@
 [lxp]
-host = 192.168.0.200
+host = 192.168.3.240
 port = 8000
-serial = 9393013580
-datalog = EF76460231
-batteries = 4
+serial = 0252016062
+datalog = BA10330137
+
+host_slave = 192.168.3.241
+port_slave = 8000
+serial_slave = 0252016063
+datalog_slave = BA10330178
+
+batteries = 2
 
 # these can be obtained from your Octopus account;
 # see the URL under Unit Rates at https://octopus.energy/dashboard/developer/
 #
 # note that the tariff_code has a different final letter depending
-# on your region, so unless you're in West Midlands you may need to change this.
+# on your region, so unless you're in North West England you may need to change this.
 [octopus]
 product_code = AGILE-18-02-21
-tariff_code = E-1R-AGILE-18-02-21-E
+tariff_code = E-1R-AGILE-18-02-21-G
 
 [server]
 # used by server.rb to open a listening port.
@@ -26,6 +32,7 @@ port = 4346
 # see https://github.com/mqtt/mqtt.github.io/wiki/URI-Scheme for URI help
 # you can leave this commented out if you don't want to use MQTT at all.
 # uri = mqtt://nas:1883
+# uri = mqtt://emonpi:emonpimqtt2016@emonpi:1883
 
 [rules]
 # use the cheapest energy to get the batteries to this SOC each night
