@@ -16,16 +16,22 @@ class MQ
       Thread.stop # sleep forever
     end
 
-    def publish(topic, message)
+    def publish(topic, message, slave)
       sub.publish_to(topic, message) if uri
+      @slave = slave
     end
 
     private
 
     def read_hold_cb(data, *)
       LOGGER.info "MQ cmd/read_hold => #{data}"
-      lux_controller.read_hold(data.to_i)
-      lux_controller.close
+      if @slave == 0
+        lux_controller.read_hold(data.to_i)
+        lux_controller.close
+      else
+        lux_controllerslave.read_hold(data.to_i)
+        lux_controllerslave.close
+      end
       sub.publish_to('octolux/result/read_hold', 'OK')
     rescue LuxController::SocketError
       sub.publish_to('octolux/result/read_hold', 'FAIL')
@@ -33,8 +39,13 @@ class MQ
 
     def read_input_cb(data, *)
       LOGGER.info "MQ cmd/read_input => #{data}"
-      lux_controller.read_input(data.to_i)
-      lux_controller.close
+      if @slave == 0
+        lux_controller.read_input(data.to_i)
+        lux_controller.close
+      else
+        lux_controllerslave.read_input(data.to_i)
+        lux_controllerslave.close
+      end
       sub.publish_to('octolux/result/read_input', 'OK')
     rescue LuxController::SocketError
       sub.publish_to('octolux/result/read_input', 'FAIL')
@@ -42,8 +53,13 @@ class MQ
 
     def ac_charge_cb(data, *)
       LOGGER.info "MQ cmd/ac_charge => #{data}"
-      r = lux_controller.charge(bool(data))
-      lux_controller.close
+      if @slave == 0
+        r = lux_controller.charge(bool(data))
+        lux_controller.close
+      else
+        r = lux_controllerslave.charge(bool(data))
+        lux_controllerslave.close
+      end
       sub.publish_to('octolux/result/ac_charge', r ? 'OK' : 'FAIL')
     rescue LuxController::SocketError
       sub.publish_to('octolux/result/ac_charge', 'FAIL')
@@ -51,8 +67,13 @@ class MQ
 
     def forced_discharge_cb(data, *)
       LOGGER.info "MQ cmd/forced_discharge => #{data}"
-      r = lux_controller.discharge(bool(data))
-      lux_controller.close
+      if @slave == 0
+        r = lux_controller.discharge(bool(data))
+        lux_controller.close
+      else
+        r = lux_controllerslave.discharge(bool(data))
+        lux_controllerslave.close
+      end
       sub.publish_to('octolux/result/forced_discharge', r ? 'OK' : 'FAIL')
     rescue LuxController::SocketError
       sub.publish_to('octolux/result/forced_discharge', 'FAIL')
@@ -60,8 +81,13 @@ class MQ
 
     def charge_pct_cb(data, *)
       LOGGER.info "MQ cmd/charge_pct => #{data}"
-      r = (lux_controller.charge_pct = data.to_i)
-      lux_controller.close
+      if @slave == 0
+        r = (lux_controller.charge_pct = data.to_i)
+        lux_controller.close
+      else
+        r = (lux_controllerslave.charge_pct = data.to_i)
+        lux_controllerslave.close
+      end
       sub.publish_to('octolux/result/charge_pct', r == data.to_i ? 'OK' : 'FAIL')
     rescue LuxController::SocketError
       sub.publish_to('octolux/result/charge_pct', 'FAIL')
@@ -69,8 +95,13 @@ class MQ
 
     def discharge_pct_cb(data, *)
       LOGGER.info "MQ cmd/discharge_pct => #{data}"
-      r = (lux_controller.discharge_pct = data.to_i)
-      lux_controller.close
+      if @slave == 0
+        r = (lux_controller.discharge_pct = data.to_i)
+        lux_controller.close
+      else
+        r = (lux_controllerslave.discharge_pct = data.to_i)
+        lux_controllerslave.close
+      end
       sub.publish_to('octolux/result/discharge_pct', r == data.to_i ? 'OK' : 'FAIL')
     rescue LuxController::SocketError
       sub.publish_to('octolux/result/discharge_pct', 'FAIL')
@@ -90,7 +121,12 @@ class MQ
                                             port: CONFIG['lxp']['port'],
                                             serial: CONFIG['lxp']['serial'],
                                             datalog: CONFIG['lxp']['datalog'])
-    end
+
+      @lux_controllerslave ||= LuxController.new(host: CONFIG['lxp']['host_slave'],
+                                              port: CONFIG['lxp']['port_slave'],
+                                              serial: CONFIG['lxp']['serial_slave'],
+                                              datalog: CONFIG['lxp']['datalog_slave'])
+        end
 
     def bool(input)
       case input

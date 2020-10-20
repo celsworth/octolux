@@ -16,7 +16,9 @@ After the datalogger reboots (this takes only a couple of seconds and does not a
 
 ## Enabling AC Charge
 
-You may need to tweak a setting to enable AC Charging. This is easiest done on LuxPower's web portal, and the phone apps will let you do it too.
+You may need to tweak a setting to enable AC Charging. This is easiest done on LuxPower's web portal, and the phone apps will let you do it too especially if you can connect locally to the inverter's dongle rather than connect via China (can be a bit slow with numerous timeouts).
+
+The trick with these apps is to select your inverter from the dropdown listbox above and then press "Read". If not connected locally, this can take 2 minutes to work. If you think it hasn't worked, just click "Read" again but be patient. After inputting you new values, press the "Set" button. Again, this can take at least a minute to work - you should see a "Success" message pop-up, otherwise "Timed Out" will appear; if this happens, just press the "Set" button once again.
 
 Check that `AC Charge Start Time 1` and `AC Charge End Time 1` are `00:00` and `23:59` respectively, as seen in this screenshot:
 

@@ -9,3 +9,10 @@ lc = LuxController.new(host: CONFIG['lxp']['host'],
                        datalog: CONFIG['lxp']['datalog'])
 
 lc.charge(true)
+
+lc_slave = LuxController.new(host: CONFIG['lxp']['host_slave'],
+    port: CONFIG['lxp']['port_slave'],
+    serial: CONFIG['lxp']['serial_slave'],
+    datalog: CONFIG['lxp']['datalog_slave'])
+
+lc_slave.charge(true)

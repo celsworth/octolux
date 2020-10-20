@@ -7,7 +7,8 @@ LOGGER.info "Current Octopus Unit Price: #{octopus.price}p"
 
 # $lc is LuxController. This talks directly to the inverter and can do things
 # like enabling/disabling AC charge and setting charge power rates.
-# LOGGER.info "Charge Power = #{lc.charge_pct}%"
+# LOGGER.info "Charge Power = #{lc-mast.charge_pct}%"
+# LOGGER.info "Charge Power = #{lc-slave.charge_pct}%"
 
 # $ls is LuxStatus. This is gleaned from the optional server.rb since the
 # data in it is only sent by the inverter every 2 minutes.
@@ -18,8 +19,13 @@ begin
   # if the current price is 5p or lower, enable AC charge
   charge = octopus.price <= 5
 
-  unless lc.charge(charge)
-    LOGGER.error 'Failed to update inverter status!'
+  unless lc-mast.charge(charge)
+    LOGGER.error 'Failed to update master inverter status :-('
+    exit 255
+  end
+
+  unless lc-slave.charge(charge)
+    LOGGER.error 'Failed to update slave inverter status :-('
     exit 255
   end
 rescue StandardError => e

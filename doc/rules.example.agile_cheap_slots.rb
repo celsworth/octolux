@@ -94,7 +94,7 @@ end
 LOGGER.info "ac_charge = #{ac_charge} ; discharge = #{discharge} (> #{min_discharge_price}p)"
 
 discharge_pct = discharge ? 100 : 0
-r = (lc.discharge_pct = discharge_pct)
-exit 255 unless r == discharge_pct
+r-mast = (lc-mast.discharge_pct = discharge_pct)
+exit 255 unless r-mast == discharge_pct
 
-exit 255 unless lc.charge(ac_charge)
+exit 255 unless lc-mast.charge(ac_charge)
