@@ -15,11 +15,14 @@ end
 # rubocop:disable Lint/UselessAssignment
 
 # FIXME: duplicated in mq.rb, could move to boot.rb?
+
+# This is for the primary (master) inverter
 lc = LuxController.new(host: CONFIG['lxp']['host'],
                        port: CONFIG['lxp']['port'],
                        serial: CONFIG['lxp']['serial'],
                        datalog: CONFIG['lxp']['datalog'])
 
+# MQTT
 ls = LuxStatus.new(host: CONFIG['server']['connect_host'] || CONFIG['server']['host'],
                    port: CONFIG['server']['port'])
 

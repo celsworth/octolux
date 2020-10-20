@@ -1,8 +1,18 @@
 # LuxPower Inverter / Octopus Time-of-use Tariff Integration
 
-This is a Ruby script to parse [Octopus ToU tariff](https://octopus.energy/agile/) prices and control a [LuxPower ACS inverter](https://www.luxpowertek.com/ac-ess.html) according to rules you specify.
+This is a Ruby script to parse [Octopus ToU tariff](https://octopus.energy/agile/) prices and control a pair of [LuxPower ACS inverter](https://www.luxpowertek.com/ac-ess.html)s working in parallel in a master/ slave arangement according to rules you specify. Cleverly written by Chris Celsworth, I've never touched Ruby before as can be seen from my bad modifications :-)
 
 The particular use-case of this is to charge your home batteries when prices are cheap, and use that power at peak times.
+
+## Additional Parallel Inverter
+
+These scripts have been slightly modifed to allow defining a Master/ Slave setup (not sure if we should be using that terminology nowadays - probably Primary/ Secondary would fit in better).
+
+When a parallel setup is used, the two inverters currently favour one battery to discharge (they should really alternate between the two) to supply the load from the batteries. If the load increases, then both inverters take up the load. This is probably down the the limitation of how the primary (master) inverter can instruct the secondary (slave) inverter to adjust its output voltage to take its share of the load. This could be fixed via the firmware but it's currently not working.
+
+However the advantage of using separate batteries on each inverter is that the charging current can be greatly increased. This is especially useful when there is a small cheap tariff window of an hour or so.
+
+As a result of two inverters, the powers transmitted by the primary (master) inverter need to be summed up with those transmitted by the secondary (slave). This is something you currently need to do externally, say, within EmonPi during input processing.
 
 ## Installation
 
@@ -17,11 +27,11 @@ sudo apt-get install ruby ruby-dev ruby-bundler git build-essential
 Clone this repository to your machine:
 
 ```
-git clone https://github.com/celsworth/octolux.git
+git clone https://github.com/andywhittaker/octolux.git
 cd octolux
 ```
 
-Now install the gems. You may occasionally need to re-run this as I update the repository and bring in new dependencies or update existing ones.  This will install gems to `./vendor/bundle`, and so should not need root:
+Now install the gems. You may occasionally need to re-run this as I update the repository and bring in new dependencies or update existing ones. This will install gems to `./vendor/bundle`, and so should not need root:
 
 ```
 bundle update
@@ -33,11 +43,12 @@ Create a `config.ini` using the `doc/config.ini.example` as a template:
 cp doc/config.ini.example config.ini
 ```
 
-This script needs to know:
+This script needs to know information about both the master (primary) and slave (secondary) inverters.
 
 * where to find your Lux inverter, host and port.
+* mast is the master and slave is the, erm, slave.
 * the serial numbers of your inverter and datalogger (the plug-in WiFi unit), which are normally printed on the sides.
-* how many batteries you have, which determines the maximum charge rate (used in agile_cheap_slots rules)
+* how many batteries you have, which determines the maximum charge rate (used in agile\_cheap\_slots rules)
 * which Octopus tariff you're on, AGILE-18-02-21 is my current one for Octopus Agile.
 * if you're using MQTT, where to find your MQTT server.
 
@@ -51,8 +62,7 @@ The idea behind keeping the rules separate is you can edit it and be unaffected 
 
 ### Inverter Setup
 
-Moved to a separate document, see [INVERTER_SETUP.md](doc/INVERTER_SETUP.md).
-
+Moved to a separate document, see [INVERTER\_SETUP.md](doc/INVERTER_SETUP.md).
 
 ## Usage
 
@@ -69,9 +79,9 @@ It's split like this because there's no way to ask the inverter for the current 
 You can use the provided systemd unit file to run the server. The instructions below will start it immediately, and then automatically on reboot. You may need to edit `octolux_server.service` before copying it into place, unless your installation is in `/home/pi/octolux`. You'll need to be root to do these steps:
 
 ```
-cp systemd/octolux_server.service /etc/systemd/system
-systemctl start octolux_server.service
-systemctl enable octolux_server.service
+sudo cp systemd/octolux_server.service /etc/systemd/system
+sudo systemctl start octolux_server.service
+sudo systemctl enable octolux_server.service
 ```
 
 The logs can then be seen with `journalctl -u octolux_server.service`.
@@ -94,26 +104,25 @@ To complement the wrapper script, there's a log rotation script which you can us
 
 This will move the current `octolux.log` into `logs/octolux.YYYYMMDD.log` at 23:59 each night.
 
-
 ## Development Notes
 
 In your `rules.rb`, you have access to a few objects to do some heavy lifting.
 
-*`octopus`* contains Octopus tariff price data. The most interesting method here is `price`:
+<i>`octopus`</i> contains Octopus tariff price data. The most interesting method here is `price`:
 
-  * `octopus.price` - the current tariff price, in pence
-  * `octopus.prices` - a Hash of tariff prices, starting with the current price. Keys are the start time of the price, values are the prices in pence.
+* `octopus.price` \- the current tariff price\, in pence
+* `octopus.prices` \- a Hash of tariff prices\, starting with the current price\. Keys are the start time of the price\, values are the prices in pence\.
 
-*`lc`* is a LuxController, which can do the following:
+<i>`lc`</i> is a LuxController, which can do the following:
 
-  * `lc.charge(true)` - enable AC charging
-  * `lc.charge(false)` - disable AC charging
-  * `lc.discharge(true)` - enable forced discharge
-  * `lc.discharge(false)` - disable forced discharge
-  * `lc.charge_pct` - get AC charge power rate, 0-100%
-  * `lc.charge_pct = 50` - set AC charge power rate to 50%
-  * `lc.discharge_pct` - get discharge power rate, 0-100%
-  * `lc.discharge_pct = 50` - set discharge power rate to 50%
+* `lc.charge(true)` \- enable AC charging
+* `lc.charge(false)` \- disable AC charging
+* `lc.discharge(true)` \- enable forced discharge
+* `lc.discharge(false)` \- disable forced discharge
+* `lc.charge_pct` \- get AC charge power rate\, 0\-100%
+* `lc.charge_pct = 50` \- set AC charge power rate to 50%
+* `lc.discharge_pct` \- get discharge power rate\, 0\-100%
+* `lc.discharge_pct = 50` \- set discharge power rate to 50%
 
 Forced discharge may be useful if you're paid for export and you have a surplus of stored power when the export rate is high.
 
