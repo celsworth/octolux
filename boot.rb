@@ -9,6 +9,7 @@ require 'bundler/setup'
 require 'logger'
 
 require 'inifile'
+require_relative 'lib/inifile' # monkey-patch :(
 require 'zeitwerk'
 
 LOGGER = Logger.new(STDOUT)
