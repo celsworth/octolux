@@ -114,6 +114,9 @@ In your `rules.rb`, you have access to a few objects to do some heavy lifting.
   * `lc.charge_pct = 50` - set AC charge power rate to 50%
   * `lc.discharge_pct` - get discharge power rate, 0-100%
   * `lc.discharge_pct = 50` - set discharge power rate to 50%
+  * `lc.charge_amount_pct` - get AC Battery Charge Level, 0-100%
+  * `lc.charge_amount_pct = 50` - set AC Battery Charge Level to 50%
+
 
 Forced discharge may be useful if you're paid for export and you have a surplus of stored power when the export rate is high.
 
