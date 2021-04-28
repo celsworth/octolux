@@ -53,6 +53,7 @@ In the following, "boolean" can be any of the following to mean true: `1`, `t`, 
   * `octolux/cmd/forced_discharge` - send this a boolean to enable or disable forced discharging. This is only useful if you get paid for export and the export rate is high. Normally, this should be off; this is *not* related to normal discharging operation.
   * `octolux/cmd/discharge_pct` - send this an integer (0-100) to set the discharge rate. Normally this is 100% to enable normal discharge. If you have another cheap electricity source and want the inverter to stop supplying electricity, setting this to 0 will do that.
   * `octolux/cmd/charge_pct` - send this an integer (0-100) to set the charge rate. This probably isn't terribly useful, but if you want to limit AC charging to less than the full 3600W, use this to do it.
+  * `octolux/cmd/charge_amount_pct` - send this an integer (0-100) to set the charge level limit when AC charging; eg to only AC Charge up to 50%, set 50.
 
 
 So for example, you could do;
