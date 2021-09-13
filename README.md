@@ -108,6 +108,8 @@ In your `rules.rb`, you have access to a few objects to do some heavy lifting.
 
   * `lc.charge(true)` - enable AC charging
   * `lc.charge(false)` - disable AC charging
+  * `lc.charge_priority(true)` - enable charging battery from solar before providing house load
+  * `lc.charge_priority(false)` - disable charging battery from solar before providing house load
   * `lc.discharge(true)` - enable forced discharge
   * `lc.discharge(false)` - disable forced discharge
   * `lc.charge_pct` - get AC charge power rate, 0-100%
