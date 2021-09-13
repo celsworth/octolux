@@ -41,6 +41,11 @@ class LuxController
     update_register(21, LXP::Packet::RegisterBits::AC_CHARGE_ENABLE, enable)
   end
 
+  def charge_priority(enable)
+    LOGGER.debug "charge_priority(#{enable})"
+    update_register(21, LXP::Packet::RegisterBits::CHARGE_PRIORITY, enable)
+  end
+
   def discharge(enable)
     LOGGER.debug "discharge(#{enable})"
     update_register(
