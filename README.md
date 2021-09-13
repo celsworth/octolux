@@ -4,6 +4,8 @@ This is a Ruby script to parse [Octopus ToU tariff](https://octopus.energy/agile
 
 The particular use-case of this is to charge your home batteries when prices are cheap, and use that power at peak times.
 
+Note that I've superceded this project with a more generic "LXP to MQTT bridge" type project, which tries to be less opinionated and focuses more on just getting messages between your inverter and MQTT. You can find it at https://github.com/celsworth/lxp-bridge.
+
 ## Installation
 
 You'll need Ruby - at least 2.3 should be fine, which can be found in all good Linux distributions.
