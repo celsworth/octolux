@@ -50,6 +50,7 @@ This will prompt a further MQ message of `octolux/inputs/1` (as above), and addi
 In the following, "boolean" can be any of the following to mean true: `1`, `t`, `true`, `y`, `yes`, `on`. Anything else is interpreted as false.
 
   * `octolux/cmd/ac_charge` - send this a boolean to enable or disable AC charging. This is taking energy from the grid to charge; this does not need to be on to charge from solar.
+  * `octolux/cmd/charge_priority` - send this a boolean to enable or disable using solar to first charge battery then provide house load.
   * `octolux/cmd/forced_discharge` - send this a boolean to enable or disable forced discharging. This is only useful if you get paid for export and the export rate is high. Normally, this should be off; this is *not* related to normal discharging operation.
   * `octolux/cmd/discharge_pct` - send this an integer (0-100) to set the discharge rate. Normally this is 100% to enable normal discharge. If you have another cheap electricity source and want the inverter to stop supplying electricity, setting this to 0 will do that.
   * `octolux/cmd/charge_pct` - send this an integer (0-100) to set the charge rate. This probably isn't terribly useful, but if you want to limit AC charging to less than the full 3600W, use this to do it.
