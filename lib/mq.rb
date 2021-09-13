@@ -9,6 +9,7 @@ class MQ
       sub.subscribe_to 'octolux/cmd/read_input', &method(:read_input_cb)
 
       sub.subscribe_to 'octolux/cmd/ac_charge', &method(:ac_charge_cb)
+      sub.subscribe_to 'octolux/cmd/charge_priority', &method(:charge_priority_cb)
       sub.subscribe_to 'octolux/cmd/forced_discharge', &method(:forced_discharge_cb)
       sub.subscribe_to 'octolux/cmd/charge_pct', &method(:charge_pct_cb)
       sub.subscribe_to 'octolux/cmd/discharge_pct', &method(:discharge_pct_cb)
@@ -49,6 +50,15 @@ class MQ
       sub.publish_to('octolux/result/ac_charge', r ? 'OK' : 'FAIL')
     rescue LuxController::SocketError
       sub.publish_to('octolux/result/ac_charge', 'FAIL')
+    end
+
+    def charge_priority_cb(data, *)
+      LOGGER.info "MQ cmd/charge_priority => #{data}"
+      r = lux_controller.charge_priority(bool(data))
+      lux_controller.close
+      sub.publish_to('octolux/result/charge_priority', r ? 'OK' : 'FAIL')
+    rescue LuxController::SocketError
+      sub.publish_to('octolux/result/charge_priority', 'FAIL')
     end
 
     def forced_discharge_cb(data, *)
